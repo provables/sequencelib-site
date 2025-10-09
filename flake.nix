@@ -9,14 +9,15 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         shell = shell-utils.myShell.${system};
+        node = pkgs.nodejs_24;
         npmDeps = pkgs.importNpmLock.buildNodeModules {
           npmRoot = ./sequencelib;
-          nodejs = pkgs.nodejs_24;
+          nodejs = node;
         };
         site = pkgs.stdenv.mkDerivation {
           name = "site";
           src = ./sequencelib;
-          buildInputs = [ pkgs.nodejs_24 npmDeps ];
+          buildInputs = [ node npmDeps ];
           buildPhase = ''
             ln -s ${npmDeps}/node_modules
             export HOME=$(mktemp -d)
