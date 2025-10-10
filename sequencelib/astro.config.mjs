@@ -20,6 +20,9 @@ export default defineConfig({
         "./src/styles/global.css",
         "@fontsource-variable/roboto",
       ],
+      components: {
+        Header: './src/components/Header.astro',
+      },
       social: [
         {
           icon: "github",

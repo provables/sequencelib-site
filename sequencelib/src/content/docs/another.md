@@ -1,6 +1,8 @@
 ---
-title: My docs
+title: Another page
 description: Learn more about my project in this docs site built with Starlight.
 ---
 
-Welcome to my project!
+# Another page
+
+Here: {Astro.locals.starlightRoute.id}
