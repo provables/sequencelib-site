@@ -21,7 +21,7 @@ export default defineConfig({
         "@fontsource-variable/roboto",
       ],
       components: {
-        Header: './src/components/Header.astro',
+        Search: './src/components/Search.astro',
       },
       social: [
         {

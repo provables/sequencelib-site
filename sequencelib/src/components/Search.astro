@@ -1,0 +1,7 @@
+---
+import OrigSearch from '@astrojs/starlight/components/Search.astro';
+
+const isNotIndex = Astro.locals.starlightRoute.id !== '';
+---
+
+{isNotIndex && <OrigSearch />}
