@@ -37,7 +37,7 @@
           name = "sequencelib-site";
           buildInputs = with pkgs; [
             go-task
-            nodejs_24
+            node
           ] ++ lib.optional stdenv.isDarwin apple-sdk_14;
         };
       }
