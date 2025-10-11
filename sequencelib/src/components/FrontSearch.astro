@@ -1,6 +1,5 @@
 ---
 import OrigSearch from '@astrojs/starlight/components/Search.astro';
-
 ---
 
 <OrigSearch />
@@ -11,7 +10,8 @@ import OrigSearch from '@astrojs/starlight/components/Search.astro';
 		const shortcut = openBtn?.querySelector('kbd');
 		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
         const sp = openBtn.querySelector('span')
-        sp.textContent = "Foo";
+        sp.textContent = "A000001, or description of sequence";
 		shortcut.style.display = 'none';
+		openBtn.style.maxWidth = "40rem";
 	})();
 </script>

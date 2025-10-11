@@ -1,22 +1,19 @@
 ---
-title: My docs
-description: Learn more about my project in this docs site built with Starlight.
+title: Sequencelib
+description: A platform for formalizing sequences from The On-Line Encyclopedia of Integer Sequences (OEIS).
 template: splash
 next: false
 ---
-
 import { Icon } from '@astrojs/starlight/components';
-import Search from '@astrojs/starlight/components/Search.astro';
-import MySearch from './src/components/MySearch.astro';
+// import MySearch from './src/components/MySearch.astro';
+import Search from './src/components/S.astro';
 
-Welcome to my project!
+A platform for formalizing sequences from The On-Line Encyclopedia of Integer Sequences (OEIS).
 
-Check out [another page](/another)
-
-<div class="sl-flex">
-<Icon name="open-book" />
-</div>
+This site contains the formalization in Lean 4 of a collection of sequences from
+OEIS. It includes metaprogramming tools that index the sequences, display values
+(example), and display equivalences among them (example).
 
 <div class="sl-flex justify-center">
-<MySearch />
+  <Search />
 </div>

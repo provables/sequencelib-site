@@ -22,7 +22,7 @@
             ln -s ${npmDeps}/node_modules
             export HOME=$(mktemp -d)
             npm run astro telemetry disable
-            npm run build
+            npx astro build
             mkdir -p $out/public_html
             mv dist/* $out/public_html
           '';
