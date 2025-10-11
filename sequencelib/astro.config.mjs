@@ -18,7 +18,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Sequencelib",
-      favicon: '/favicon.png',
+      favicon: "/favicon.png",
       customCss: [
         // Path to your Tailwind base styles:
         "./src/styles/global.css",
@@ -27,6 +27,23 @@ export default defineConfig({
       components: {
         Search: "./src/components/Search.astro",
       },
+      sidebar: [
+        {
+          label: "Getting Started",
+          // Autogenerate a group of links for the 'constellations' directory.
+          items: [ 'getting_started/about', 'getting_started/contributing' ]
+        },
+        {
+          label: "Index of Sequences",
+          link: "/all_sequences"
+        },
+        {
+          label: "Sequences",
+          // Autogenerate a group of links for the 'constellations' directory.
+          autogenerate: { directory: "sequences" },
+          collapsed: true
+        },
+      ],
       social: [
         {
           icon: "github",
