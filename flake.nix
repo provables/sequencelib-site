@@ -10,21 +10,16 @@
         pkgs = nixpkgs.legacyPackages.${system};
         shell = shell-utils.myShell.${system};
         node = pkgs.nodejs_24;
-        npmDeps = pkgs.importNpmLock.buildNodeModules {
-          npmRoot = ./sequencelib;
-          nodejs = node;
-        };
-        site = pkgs.stdenv.mkDerivation {
+        site = pkgs.buildNpmPackage {
           name = "site";
           src = ./sequencelib;
-          buildInputs = [ node npmDeps ];
-          buildPhase = ''
-            ln -s ${npmDeps}/node_modules
-            export HOME=$(mktemp -d)
-            npm run astro telemetry disable
-            npx astro build
+          npmDepsHash = "sha256-k7wpby8pFhdANuM2AaHS6d3PFH12pkFnlcJSNQNG9HM=";
+          nodejs = node;
+          installPhase = ''
+            runHook preInstall
             mkdir -p $out/public_html
-            mv dist/* $out/public_html
+            ${pkgs.rsync}/bin/rsync -a dist/ $out/public_html
+            runHook postInstall
           '';
         };
       in

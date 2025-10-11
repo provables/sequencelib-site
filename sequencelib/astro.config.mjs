@@ -11,7 +11,7 @@ export default defineConfig({
     cacheDir: ".vite",
     plugins: [tailwindcss()],
     resolve: {
-      preserveSymlinks: true,
+      preserveSymlinks: false,
     },
   },
 
