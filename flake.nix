@@ -13,7 +13,7 @@
         site = pkgs.buildNpmPackage {
           name = "site";
           src = ./sequencelib;
-          npmDepsHash = "sha256-k7wpby8pFhdANuM2AaHS6d3PFH12pkFnlcJSNQNG9HM=";
+          npmDepsHash = "sha256-yCVRCt6fTc/zJy2jHRdWZsu9T3oQnL8h9/RI8ZeMfk4=";
           nodejs = node;
           installPhase = ''
             runHook preInstall
