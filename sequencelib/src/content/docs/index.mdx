@@ -2,10 +2,12 @@
 title: My docs
 description: Learn more about my project in this docs site built with Starlight.
 template: splash
+next: false
 ---
 
 import { Icon } from '@astrojs/starlight/components';
 import Search from '@astrojs/starlight/components/Search.astro';
+import MySearch from './src/components/MySearch.astro';
 
 Welcome to my project!
 
@@ -15,4 +17,6 @@ Check out [another page](/another)
 <Icon name="open-book" />
 </div>
 
-<Search />
+<div class="sl-flex justify-center">
+<MySearch />
+</div>
