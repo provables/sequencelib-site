@@ -18,6 +18,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Sequencelib",
+      favicon: './public/favicon.png',
       customCss: [
         // Path to your Tailwind base styles:
         "./src/styles/global.css",
