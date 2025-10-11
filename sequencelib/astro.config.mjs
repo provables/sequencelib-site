@@ -10,6 +10,9 @@ export default defineConfig({
   vite: {
     cacheDir: ".vite",
     plugins: [tailwindcss()],
+    resolve: {
+      preserveSymlinks: true,
+    },
   },
 
   integrations: [
@@ -21,7 +24,7 @@ export default defineConfig({
         "@fontsource-variable/roboto",
       ],
       components: {
-        Search: './src/components/Search.astro',
+        Search: "./src/components/Search.astro",
       },
       social: [
         {
