@@ -29,19 +29,23 @@ export default defineConfig({
       },
       sidebar: [
         {
+          label: "Home",
+          link: "/",
+        },
+        {
           label: "Getting Started",
           // Autogenerate a group of links for the 'constellations' directory.
-          items: [ 'getting_started/about', 'getting_started/contributing' ]
+          items: ["getting_started/about", "getting_started/contributing"],
         },
         {
           label: "Index of Sequences",
-          link: "/all_sequences"
+          link: "/all_sequences",
         },
         {
           label: "Sequences",
           // Autogenerate a group of links for the 'constellations' directory.
           autogenerate: { directory: "sequences" },
-          collapsed: true
+          collapsed: true,
         },
       ],
       social: [
