@@ -38,10 +38,6 @@ export default defineConfig({
           items: ["getting_started/about", "getting_started/contributing"],
         },
         {
-          label: "Index of Sequences",
-          link: "/all_sequences",
-        },
-        {
           label: "Sequences",
           // Autogenerate a group of links for the 'constellations' directory.
           autogenerate: { directory: "sequences" },
