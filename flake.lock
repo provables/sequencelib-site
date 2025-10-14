@@ -85,7 +85,24 @@
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
+        "sequencelib-lean-info": "sequencelib-lean-info",
         "shell-utils": "shell-utils"
+      }
+    },
+    "sequencelib-lean-info": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1760402708,
+        "narHash": "sha256-WYCddDZ8vaUh1nLSQWSeU6VUvuWCp0LVmVp6HRk6d/4=",
+        "ref": "refs/heads/main",
+        "rev": "dcf1bfc3f85bacd02007a273703ce7a3287f32f3",
+        "revCount": 1,
+        "type": "git",
+        "url": "ssh://git@provables.wetdog.digital/users/git/sequencelib-lean-info"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@provables.wetdog.digital/users/git/sequencelib-lean-info"
       }
     },
     "shell-utils": {

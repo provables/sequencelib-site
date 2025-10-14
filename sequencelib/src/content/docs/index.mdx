@@ -6,6 +6,7 @@ next: false
 ---
 
 import Search from '../../components/FrontSearch.astro';
+import RandomSequence from '../../components/RandomSequence.astro';
 import { Card } from '@astrojs/starlight/components';
 import { LinkButton } from '@astrojs/starlight/components';
 import { LinkCard } from '@astrojs/starlight/components';
@@ -32,9 +33,7 @@ import { Icon } from '@astrojs/starlight/components';
   <Search />
 </div>
 <div class="sl-flex justify-center mt-0">
-  <LinkButton href="/random">
-    Random Sequence
-  </LinkButton>
+  <RandomSequence />
   <LinkButton href="/A000">
     Browse Index
   </LinkButton>

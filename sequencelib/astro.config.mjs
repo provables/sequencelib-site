@@ -35,6 +35,10 @@ export default defineConfig({
           link: "/",
         },
         {
+          label: "Test",
+          link: "/test",
+        },
+        {
           label: "Getting Started",
           // Autogenerate a group of links for the 'constellations' directory.
           items: ["getting_started/about", "getting_started/contributing"],
