@@ -11,6 +11,8 @@ import { Card } from '@astrojs/starlight/components';
 import { LinkButton } from '@astrojs/starlight/components';
 import { LinkCard } from '@astrojs/starlight/components';
 import { Icon } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { result } from "../../components/lean_info";
 
 #### A platform for formalizing sequences from The On-Line Encyclopedia of Integer Sequences (OEIS)
 
@@ -28,6 +30,10 @@ import { Icon } from '@astrojs/starlight/components';
 
 <div class="sl-flex justify-center mt-12 text-2xl">
   Explore Sequencelib
+</div>
+<div class="sl-flex justify-center">
+  <Badge class="mx-2" text={`${result.num_seqs.toLocaleString()} sequences`} variant="success" size="medium" />
+  <Badge class="mx-2" text={`${result.num_thms.toLocaleString()} theorems`} variant="tip" size="medium" />
 </div>
 <div class="sl-flex justify-center mt-4">
   <Search />
