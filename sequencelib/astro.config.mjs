@@ -19,6 +19,7 @@ export default defineConfig({
     starlight({
       title: "Sequencelib",
       favicon: "/favicon.png",
+      lastUpdated: true,
       customCss: [
         // Path to your Tailwind base styles:
         "./src/styles/global.css",
@@ -26,6 +27,7 @@ export default defineConfig({
       ],
       components: {
         Search: "./src/components/Search.astro",
+        Pagination: "./src/components/Pagination.astro",
       },
       sidebar: [
         {
