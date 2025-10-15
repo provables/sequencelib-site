@@ -3,6 +3,66 @@ title: A000001
 slug: A000/A000001
 ---
 
-Sequence A000001
+import { Badge } from '@astrojs/starlight/components';
 
-<button class="btn btn-secondary">Secondary</button>
+[OEIS<i class="fa-solid fa-up-right-from-square"></i>](https://oeis.org/A000001) 
+[Lean4<i class="fa-solid fa-up-right-from-square"></i>](https://provables.github.io/sequencelib/docs/Sequencelib/FiniteGroups.html) 
+
+Number of groups of order n. 
+ 
+<div class="badge badge-info">offset: 0</div>
+<div class="badge badge-info">ℕ</div>
+
+- <span>
+    <a href="" class="align-middle">NonIsoSubgroupsSymmOfOrder</a> 
+    <span class="badge badge-warning ml-4 mb-0">noncomputable</span>
+  </span>
+- <span>
+    <a href="" class="align-middle">NonIsoSubgroupsSymmOfOrder</a> 
+    <span class="badge badge-warning ml-4 mb-0">noncomputable</span>
+  </span>
+
+<div class="overflow-x-scroll rounded-box border px-4"
+    style="background-color: var(--sl-color-gray-6); border-color: var(--sl-color-accent)"
+>
+  <table class="table-auto">
+    <thead>
+      <tr>
+        <th>n</th>
+        <th>0</th>
+        <th>1</th>
+        <th>2</th>
+        <th>0</th>
+        <th>0</th>
+        <th>0</th>
+        <th>1</th>
+        <th>2</th>
+        <th>1</th>
+        <th>2</th>
+        <th>1</th>
+        <th>2</th>
+        <th>0</th>
+        <th>1</th>
+        <th>2</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th><a href="">NonIsoSubgroupsSymmOfOrder</a></th>
+        <td class="text-right">0</td>
+        <td>392309234321</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <th><a href="">NonIsoGrpOfOrder</a></th>
+        <td>0</td>
+        <td class="text-right">1</td>
+        <td>1</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+#### Equivalences
+
+- [NonIsoGrpOfOrder = NonIsoSubgroupsSymmOfOrder](https://example.org)

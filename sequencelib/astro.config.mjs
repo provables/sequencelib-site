@@ -24,6 +24,7 @@ export default defineConfig({
         // Path to your Tailwind base styles:
         "./src/styles/global.css",
         "@fontsource-variable/roboto",
+        "./src/styles/all.min.css",
       ],
       components: {
         Search: "./src/components/Search.astro",

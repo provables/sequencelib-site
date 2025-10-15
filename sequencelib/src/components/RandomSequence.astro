@@ -1,9 +1,11 @@
 ---
 import { result } from "./lean_info";
 import { LinkButton } from '@astrojs/starlight/components';
+
+const { class: className } = Astro.props;
 ---
 
-<LinkButton id="random" href="" data-result={JSON.stringify(result.ids)}>
+<LinkButton class={className} id="random" href="" data-result={JSON.stringify(result.ids)}>
     Random Sequence
 </LinkButton>
 
