@@ -14,13 +14,14 @@
         pkgs = nixpkgs.legacyPackages.${system};
         shell = shell-utils.myShell.${system};
         node = pkgs.nodejs_24;
+        myPython = pkgs.python313.withPackages (ps: [ ps.ipython ps.jinja2 ]);
         site = pkgs.buildNpmPackage {
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/lean_oeis_info.json";
           name = "site";
           src = ./sequencelib;
           npmDepsHash = "sha256-yCVRCt6fTc/zJy2jHRdWZsu9T3oQnL8h9/RI8ZeMfk4=";
           nodejs = node;
-          buildInputs = with pkgs; [ python313 ];
+          buildInputs = with pkgs; [ myPython ];
           installPhase = ''
             runHook preInstall
             echo "SEQUENCELIB_LEAN_INFO is $SEQUENCELIB_LEAN_INFO"
@@ -38,7 +39,7 @@
         devShell = shell {
           name = "sequencelib-site";
           buildInputs = with pkgs; [
-            (python313.withPackages (ps: [ ps.ipython ]))
+            myPython
             go-task
             node
           ] ++ lib.optional stdenv.isDarwin apple-sdk_14;
