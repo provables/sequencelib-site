@@ -1,0 +1,65 @@
+---
+title: {{ tag }}
+slug: {{ tag[:4] }}/{{ tag }}
+---
+
+{% raw -%}
+import { Badge } from '@astrojs/starlight/components';
+{%- endraw %}
+
+[OEIS<i class="fa-solid fa-up-right-from-square"></i>](https://oeis.org/{{ tag }}) 
+[Lean4<i class="fa-solid fa-up-right-from-square"></i>](https://provables.github.io/sequencelib/docs/{{ module_html }}) 
+
+{{ description }}
+ 
+<div class="badge badge-info">offset: {{ offset }}</div>
+<div class="badge badge-info">codomain: {{ codomain }}</div>
+
+{% for decl in decls -%}
+- <span>
+    <a href="{{ base_url }}/{{ module_html }}#{{ decl[1] }}" class="align-middle">{{ decl[0] }}</a>
+    <span class="badge badge-{{ computability_tag }} ml-4 mb-0">{{ computability }}</span>
+  </span>
+{%- endfor %}
+
+## Values
+
+<div class="overflow-x-scroll rounded-box border px-4"
+    style="background-color: var(--sl-color-bg-sidebar); border-color: var(--sl-color-accent)"
+>
+  <table class="table-auto">
+    <thead>
+      <tr>
+        <th>n</th>
+        {%- for idx in value_indices %}
+        <th class="text-right">{{ idx }}</th>
+        {%- endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {%- for decl in decls %}
+      <tr>
+        <th><a href="{{ base_url }}/{{ module_html }}#{{ decl[1] }}">
+          {{ decl[0] }}
+          </a>
+        </th>
+        {%- for value in values[decl[0]] %}
+        <td class="text-right">
+          {%- if value[1] %}
+            <a href="{{ base_url}}/{{ mdule_html }}#{{ value[1] }}">{{ value[0] }}</a>
+          {%- else %}
+            {{ value[0] }}
+          {%- endif %}
+        </td>
+        {%- endfor %}
+      </tr>
+      {%- endfor %}
+    </tbody>
+  </table>
+</div>
+
+## Equivalences
+
+{% for equiv in equivalences %}
+- [{{ equiv[0]}} = {{ equiv[1] }}]({{ base_url }}/{{ module_html }}#{{ equiv[2] }})
+{% endfor %}
