@@ -15,10 +15,12 @@ import { Badge } from '@astrojs/starlight/components';
 <div class="badge badge-info">offset: {{ offset }}</div>
 <div class="badge badge-info">codomain: {{ codomain }}</div>
 
-{% for decl in decls -%}
+## Declarations
+
+{% for name, decl in decls.items() %}
 - <span>
-    <a href="{{ base_url }}/{{ module_html }}#{{ decl[1] }}" class="align-middle">{{ decl[0] }}</a>
-    <span class="badge badge-{{ computability_tag }} ml-4 mb-0">{{ computability }}</span>
+    <a href="{{ base_url }}/{{ module_html }}#{{ decl.full_name }}" class="align-middle">{{ name }}</a>
+    <span class="badge badge-{{ decl.computability_tag }} ml-4 mb-0">{{ decl.computability }}</span>
   </span>
 {%- endfor %}
 
@@ -37,16 +39,16 @@ import { Badge } from '@astrojs/starlight/components';
       </tr>
     </thead>
     <tbody>
-      {%- for decl in decls %}
+      {%- for name, decl in decls.items() %}
       <tr>
-        <th><a href="{{ base_url }}/{{ module_html }}#{{ decl[1] }}">
-          {{ decl[0] }}
+        <th><a href="{{ base_url }}/{{ module_html }}#{{ decl.full_name }}">
+          {{ name }}
           </a>
         </th>
-        {%- for value in values[decl[0]] %}
+        {%- for value in decl["values"] %}
         <td class="text-right">
           {%- if value[1] %}
-            <a href="{{ base_url}}/{{ mdule_html }}#{{ value[1] }}">{{ value[0] }}</a>
+            <a href="{{ base_url }}/{{ mdule_html }}#{{ value[1] }}">{{ value[0] }}</a>
           {%- else %}
             {{ value[0] }}
           {%- endif %}

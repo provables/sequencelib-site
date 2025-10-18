@@ -14,7 +14,11 @@
         pkgs = nixpkgs.legacyPackages.${system};
         shell = shell-utils.myShell.${system};
         node = pkgs.nodejs_24;
-        myPython = pkgs.python313.withPackages (ps: [ ps.ipython ps.jinja2 ]);
+        myPython = pkgs.python313.withPackages (ps: [
+          ps.ipython
+          ps.jinja2
+          ps.networkx
+        ]);
         site = pkgs.buildNpmPackage {
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/lean_oeis_info.json";
           name = "site";
