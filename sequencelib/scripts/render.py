@@ -13,6 +13,9 @@ SEQUENCELIB_LEAN_INFO = Path(
 )
 TEMPLATE = "seq.j2"
 BASE_URL = "https://provables.github.io/sequencelib/docs"
+OUTPUT_DIR = Path("/tmp")
+
+TMPL = Environment(loader=FileSystemLoader(HERE)).get_template(TEMPLATE)
 
 
 def all_equivalences(equivalences):
@@ -28,10 +31,10 @@ def values_table(decls):
     for decl, decl_info in decls.items():
         thms = decl_info["thms"]
         max_ = 0
-        values = [""] * MAX_VALUE
+        values = [{}] * MAX_VALUE
         for thm in thms.values():
             if thm["type"] == "equiv":
-                equivalences[thm["seq1"], thm["seq2"]] = True
+                equivalences[thm["seq1"], thm["seq2"]] = thm["theorem"]
                 continue
             if thm["type"] != "value":
                 continue
@@ -52,7 +55,7 @@ def values_table(decls):
 
     max_n = max([row["max"] for row in data.values()])
     # headers = ["n"] + list(range(decls["offset"], max_n + 1))
-    return data, max_n
+    return data, max_n, equivalences
 
 
 def simple(name):
@@ -66,23 +69,27 @@ def computability(value):
         return ("noncomputable", "warning")
 
 
-def process_seq(key, value):
+def process_mod(key, value):
     """Process an entry of the JSON info."""
     for tag, data in value.items():
         module_html = f"{key.replace('.', '/')}.html"
         description = data["description"]
         offset = data["offset"]
         codomain = {"Codomain.Nat": "ℕ", "Codomain.Int": "ℤ"}[data["codomain"]]
-        table, max_n = values_table(data["decls"])
+        table, max_n, equivs = values_table(data["decls"])
         decls = {
             simple(decl): {
                 "full_name": decl,
                 "computability": computability(decl_data["isComputable"])[0],
                 "computability_tag": computability(decl_data["isComputable"])[1],
-                "values": [(x["value"], x.get("thm")) for x in table[decl]["values"][:max_n]],
+                "values": [
+                    (x.get("value", ""), x.get("thm"))
+                    for x in table[decl]["values"][offset : max_n + 1]
+                ],
             }
             for (decl, decl_data) in data["decls"].items()
         }
+        value_indices = list(range(offset, max_n + 1))
         yield {
             "base_url": BASE_URL,
             "tag": tag,
@@ -91,47 +98,50 @@ def process_seq(key, value):
             "offset": offset,
             "codomain": codomain,
             "decls": decls,
+            "value_indices": value_indices,
+            "equivalences": [(a, b, c) for (a, b), c in equivs.items()],
         }
 
 
-def render():
-    env = Environment(loader=FileSystemLoader(HERE))
-    tmpl = env.get_template(TEMPLATE)
-    return tmpl.render(
-        base_url=BASE_URL,
-        tag="A000001",
-        module_html="Sequencelib/FiniteGroups.html",
-        description="Number of groups of order n.",
-        offset=0,
-        codomain="ℕ",
-        decls={
-            "NonIsoSubgroupsSymmOfOrder": {
-                "full_name": "Sequence.NonIsoSubgroupsSymmOfOrder",
-                "values": [
-                    (1, "Sequence.NonIsoSubgroupsSymmOfOrder_one"),
-                    (1, None),
-                    (2, None),
-                ],
-                "computability": "noncomputable",
-                "computability_tag": "warning",
-            },
-            "NonIsoGrpOfOrder": {
-                "full_name": "Sequence.NonIsoGrpOfOrder",
-                "values": [
-                    (1, None),
-                    (1, None),
-                    (2, "Sequence.NonIsoSubgroupsSymmOfOrder_two"),
-                ],
-                "computability": "noncomputable",
-                "computability_tag": "warning",
-            },
-        },
-        value_indices=[0, 1, 2],
-        equivalences=[
-            (
-                "NonIsoGrpOfOrder",
-                "NonIsoSubgroupsSymmOfOrder",
-                "Sequence.NonIsoGrpOfOrder_eq_NonIsoSubgroupsSymmOfOrder",
-            )
-        ],
-    )
+def render(seq_data):
+    out = OUTPUT_DIR / f"{seq_data["tag"]}.mdx"
+    content = TMPL.render(**seq_data)
+    out.write_text(content)
+
+    #     base_url=BASE_URL,
+    #     tag="A000001",
+    #     module_html="Sequencelib/FiniteGroups.html",
+    #     description="Number of groups of order n.",
+    #     offset=0,
+    #     codomain="ℕ",
+    #     decls={
+    #         "NonIsoSubgroupsSymmOfOrder": {
+    #             "full_name": "Sequence.NonIsoSubgroupsSymmOfOrder",
+    #             "values": [
+    #                 (1, "Sequence.NonIsoSubgroupsSymmOfOrder_one"),
+    #                 (1, None),
+    #                 (2, None),
+    #             ],
+    #             "computability": "noncomputable",
+    #             "computability_tag": "warning",
+    #         },
+    #         "NonIsoGrpOfOrder": {
+    #             "full_name": "Sequence.NonIsoGrpOfOrder",
+    #             "values": [
+    #                 (1, None),
+    #                 (1, None),
+    #                 (2, "Sequence.NonIsoSubgroupsSymmOfOrder_two"),
+    #             ],
+    #             "computability": "noncomputable",
+    #             "computability_tag": "warning",
+    #         },
+    #     },
+    #     value_indices=[0, 1, 2],
+    #     equivalences=[
+    #         (
+    #             "NonIsoGrpOfOrder",
+    #             "NonIsoSubgroupsSymmOfOrder",
+    #             "Sequence.NonIsoGrpOfOrder_eq_NonIsoSubgroupsSymmOfOrder",
+    #         )
+    #     ],
+    # )
