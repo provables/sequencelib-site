@@ -69,43 +69,60 @@ def computability(value):
         return ("noncomputable", "warning")
 
 
-def process_mod(key, value):
-    """Process an entry of the JSON info."""
-    for tag, data in value.items():
-        module_html = f"{key.replace('.', '/')}.html"
-        description = data["description"]
-        offset = data["offset"]
-        codomain = {"Codomain.Nat": "ℕ", "Codomain.Int": "ℤ"}[data["codomain"]]
-        table, max_n, equivs = values_table(data["decls"])
-        decls = {
-            simple(decl): {
-                "full_name": decl,
-                "computability": computability(decl_data["isComputable"])[0],
-                "computability_tag": computability(decl_data["isComputable"])[1],
-                "values": [
-                    (x.get("value", ""), x.get("thm"))
-                    for x in table[decl]["values"][offset : max_n + 1]
-                ],
-            }
-            for (decl, decl_data) in data["decls"].items()
-        }
-        value_indices = list(range(offset, max_n + 1))
-        yield {
-            "base_url": BASE_URL,
-            "tag": tag,
-            "module_html": module_html,
-            "description": description,
-            "offset": offset,
-            "codomain": codomain,
-            "decls": decls,
-            "value_indices": value_indices,
-            "equivalences": [(a, b, c) for (a, b), c in equivs.items()],
-        }
+def transponse_to_bytags(info):
+    result = {}
+    for mod, tags_in_mod in info.items():
+        for tag, decls_for_tag in tags_in_mod.items():
+            bymods = result.setdefault(tag, {})
+            bymods.setdefault("mods", {})
+            bymods["mods"][mod] = decls_for_tag
+            bymods["description"] = decls_for_tag["description"]
+            bymods["keywords"] = decls_for_tag["keywords"]
+            bymods["offset"] = decls_for_tag["offset"]
+            decl = next(iter(decls_for_tag["decls"].values()))
+            bymods["codomain"] = decl["codomain"]
+    return result
 
 
-def render(seq_data):
-    out = OUTPUT_DIR / f"{seq_data["tag"]}.mdx"
-    content = TMPL.render(**seq_data)
+def process_tag(tag, value):
+    description = value["description"]
+    offset = value["offset"]
+    codomain = value["codomain"]
+    all_decls_for_tag = {}
+    for mod_name, mod in value["mods"].items():
+        for decl, d in mod["decls"].items():
+            d["mod"] = mod_name
+            all_decls_for_tag[decl] = d
+    table, max_n, equivs = values_table(all_decls_for_tag)
+    value_indices = list(range(offset, max_n + 1))
+    decls = {
+        simple(decl): {
+            "full_name": decl,
+            "computability": computability(decl_data["isComputable"])[0],
+            "computability_tag": computability(decl_data["isComputable"])[1],
+            "values": [
+                (x.get("value", ""), x.get("thm"))
+                for x in table[decl]["values"][offset : max_n + 1]
+            ],
+            "mod": f'{decl_data["mod"].replace(".", "/")}.html',
+        }
+        for (decl, decl_data) in all_decls_for_tag.items()
+    }
+    return {
+        "base_url": BASE_URL,
+        "tag": tag,
+        "description": description,
+        "offset": offset,
+        "codomain": codomain,
+        "decls": decls,
+        "value_indices": value_indices,
+        "equivalences": [(a, b, c) for (a, b), c in equivs.items()],
+    }
+
+
+def render(tag, value):
+    out = OUTPUT_DIR / f"{tag}.mdx"
+    content = TMPL.render(**process_tag(tag, value))
     out.write_text(content)
 
     #     base_url=BASE_URL,

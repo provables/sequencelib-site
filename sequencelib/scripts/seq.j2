@@ -19,7 +19,7 @@ import { Badge } from '@astrojs/starlight/components';
 
 {% for name, decl in decls.items()|sort %}
 - <span>
-    <a href="{{ base_url }}/{{ module_html }}#{{ decl.full_name }}" class="align-middle">{{ name }}</a>
+    <a href="{{ base_url }}/{{ decl.mod }}#{{ decl.full_name }}" class="align-middle">{{ name }}</a>
     <span class="badge badge-{{ decl.computability_tag }} ml-4 mb-0">{{ decl.computability }}</span>
   </span>
 {%- endfor %}
@@ -41,11 +41,11 @@ import { Badge } from '@astrojs/starlight/components';
     <tbody>
       {%- for name, decl in decls.items()|sort %}
       <tr>
-        <th><a href="{{ base_url }}/{{ module_html }}#{{ decl.full_name }}">{{ name.strip() }}</a></th>
+        <th><a href="{{ base_url }}/{{ decl.mod }}#{{ decl.full_name }}">{{ name.strip() }}</a></th>
         {%- for value in decl["values"] %}
         <td class="text-right">
           {%- if value[1] %}
-            <a href="{{ base_url }}/{{ mdule_html }}#{{ value[1] }}">{{ value[0] }}</a>
+            <a href="{{ base_url }}/{{ decl.mod }}#{{ value[1] }}">{{ value[0] }}</a>
           {%- else %}
             {{ value[0] }}
           {%- endif %}
