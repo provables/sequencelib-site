@@ -5,13 +5,16 @@ slug: {{ tag[:4] }}/{{ tag }}
 
 {% raw -%}
 import { Badge } from '@astrojs/starlight/components';
+import { Code } from '@astrojs/starlight/components';
 {%- endraw %}
 
 [OEIS<i class="fa-solid fa-up-right-from-square"></i>](https://oeis.org/{{ tag }}) 
-[Lean4<i class="fa-solid fa-up-right-from-square"></i>](https://provables.github.io/sequencelib/docs/{{ module_html }}) 
+{% for m in mods -%}
+[Lean4<i class="fa-solid fa-up-right-from-square"></i>](https://provables.github.io/sequencelib/docs/{{ m }}) 
+{% endfor %}
 
-{{ description }}
- 
+<Code wrap="true" code="{{ description }}" />
+
 <div class="badge badge-info">offset: {{ offset }}</div>
 <div class="badge badge-info">codomain: {{ codomain }}</div>
 

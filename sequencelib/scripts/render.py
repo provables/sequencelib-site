@@ -61,6 +61,10 @@ def values_table(decls):
     return data, max_n, equivalences
 
 
+def tag_to_block(tag):
+    return tag[:4]
+
+
 def simple(name):
     return name.split(".")[-1]
 
@@ -94,7 +98,7 @@ def transponse_to_bytags(info):
 def process_tag(tag, value):
     description = value["description"]
     offset = value["offset"]
-    codomain = value["codomain"]
+    codomain = {"Codomain.Nat": "ℕ", "Codomain.Int": "ℤ"}[value["codomain"]]
     all_decls_for_tag = {}
     for mod_name, mod in value["mods"].items():
         for decl, d in mod["decls"].items():
@@ -115,9 +119,7 @@ def process_tag(tag, value):
         }
         for (decl, decl_data) in all_decls_for_tag.items()
     }
-    equivalences = [
-        (a, b, c, name_to_mod(m)) for (a, b), (c, m) in equivs.items()
-    ]
+    equivalences = [(a, b, c, name_to_mod(m)) for (a, b), (c, m) in equivs.items()]
     return {
         "base_url": BASE_URL,
         "tag": tag,
@@ -127,13 +129,28 @@ def process_tag(tag, value):
         "decls": decls,
         "value_indices": value_indices,
         "equivalences": equivalences,
+        "mods": set(decl["mod"] for decl in decls.values())
     }
 
 
-def render(tag, value):
+def render_tag(tag, value):
     out = OUTPUT_DIR / f"{tag}.mdx"
     content = TMPL.render(**process_tag(tag, value))
     out.write_text(content)
+
+
+def render(info, output_dir, only_block=None):
+    by_tags = transponse_to_bytags(info)
+    for tag, value in by_tags.items():
+        if only_block and tag_to_block(tag) != only_block:
+            continue
+        print(f"Rendering: {tag}")
+        data = process_tag(tag, value)
+        content = TMPL.render(**data)
+        out_dir = output_dir / tag_to_block(tag)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out_file = out_dir / f"{tag}.mdx"
+        out_file.write_text(content)
 
     #     base_url=BASE_URL,
     #     tag="A000001",
