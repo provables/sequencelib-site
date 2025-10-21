@@ -34,7 +34,10 @@ def values_table(decls):
         values = [{}] * MAX_VALUE
         for thm in thms.values():
             if thm["type"] == "equiv":
-                equivalences[thm["seq1"], thm["seq2"]] = thm["theorem"]
+                equivalences[thm["seq1"], thm["seq2"]] = (
+                    thm["theorem"],
+                    decl_info["mod"],
+                )
                 continue
             if thm["type"] != "value":
                 continue
@@ -60,6 +63,10 @@ def values_table(decls):
 
 def simple(name):
     return name.split(".")[-1]
+
+
+def name_to_mod(name):
+    return f'{name.replace(".", "/")}.html'
 
 
 def computability(value):
@@ -104,10 +111,13 @@ def process_tag(tag, value):
                 (x.get("value", ""), x.get("thm"))
                 for x in table[decl]["values"][offset : max_n + 1]
             ],
-            "mod": f'{decl_data["mod"].replace(".", "/")}.html',
+            "mod": name_to_mod(decl_data["mod"]),
         }
         for (decl, decl_data) in all_decls_for_tag.items()
     }
+    equivalences = [
+        (a, b, c, name_to_mod(m)) for (a, b), (c, m) in equivs.items()
+    ]
     return {
         "base_url": BASE_URL,
         "tag": tag,
@@ -116,7 +126,7 @@ def process_tag(tag, value):
         "codomain": codomain,
         "decls": decls,
         "value_indices": value_indices,
-        "equivalences": [(a, b, c) for (a, b), c in equivs.items()],
+        "equivalences": equivalences,
     }
 
 

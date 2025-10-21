@@ -59,6 +59,6 @@ import { Badge } from '@astrojs/starlight/components';
 
 ## Equivalences
 
-{% for equiv in equivalences %}
-- [{{ equiv[0]}} = {{ equiv[1] }}]({{ base_url }}/{{ module_html }}#{{ equiv[2] }})
+{% for seq1, seq2, equiv, mod in equivalences %}
+- [{{ seq1 }} = {{ seq2 }}]({{ base_url }}/{{ mod }}#{{ equiv }})
 {% endfor %}
