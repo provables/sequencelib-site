@@ -6,16 +6,20 @@ from jinja2 import Environment, FileSystemLoader
 import networkx as nx
 from collections import OrderedDict
 import itertools
+import re
 
 HERE = Path(__file__).parent.resolve()
 SEQUENCELIB_LEAN_INFO = Path(
     os.environ.get("SEQUENCELIB_LEAN_INFO", "/tmp/sequencelib_lean_info.json")
 )
 TEMPLATE = "seq.j2"
+SUMMARY = "block.j2"
 BASE_URL = "https://provables.github.io/sequencelib/docs"
 OUTPUT_DIR = Path("/tmp")
 
-TMPL = Environment(loader=FileSystemLoader(HERE)).get_template(TEMPLATE)
+env = Environment(loader=FileSystemLoader(HERE))
+TMPL = env.get_template(TEMPLATE)
+SUMMARY_TMPL = env.get_template(SUMMARY)
 
 
 def all_equivalences(equivalences):
@@ -123,13 +127,13 @@ def process_tag(tag, value):
     return {
         "base_url": BASE_URL,
         "tag": tag,
-        "description": description,
+        "description": description.replace('"', '&quot;'),
         "offset": offset,
         "codomain": codomain,
         "decls": decls,
         "value_indices": value_indices,
         "equivalences": equivalences,
-        "mods": set(decl["mod"] for decl in decls.values())
+        "mods": set(decl["mod"] for decl in decls.values()),
     }
 
 
@@ -139,18 +143,38 @@ def render_tag(tag, value):
     out.write_text(content)
 
 
+def escape(text):
+    return re.sub(r"([\*_<>{}])", r"\\\1", text)
+
+
 def render(info, output_dir, only_block=None):
     by_tags = transponse_to_bytags(info)
+    by_blocks = {}
     for tag, value in by_tags.items():
-        if only_block and tag_to_block(tag) != only_block:
+        block = tag_to_block(tag)
+        by_blocks.setdefault(block, {})
+        if only_block and block != only_block:
             continue
+        by_blocks[block].setdefault("seqs", [])
+        by_blocks[block]["seqs"].append(
+            {"tag": tag, "description": escape(value["description"])}
+        )
         print(f"Rendering: {tag}")
         data = process_tag(tag, value)
         content = TMPL.render(**data)
-        out_dir = output_dir / tag_to_block(tag)
+        out_dir = output_dir / block
         out_dir.mkdir(parents=True, exist_ok=True)
         out_file = out_dir / f"{tag}.mdx"
         out_file.write_text(content)
+
+    for block in by_blocks:
+        by_blocks[block]["num_seqs_in_block"] = len(by_blocks[block].get("seqs", []))
+        by_blocks[block].get("seqs", []).sort(key=lambda x: x["tag"])
+        print(f"Rendering summary for block: {block}")
+        out_dir = output_dir / block
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out_file = out_dir / "summary.mdx"
+        out_file.write_text(SUMMARY_TMPL.render(block=block, **by_blocks[block]))
 
     #     base_url=BASE_URL,
     #     tag="A000001",

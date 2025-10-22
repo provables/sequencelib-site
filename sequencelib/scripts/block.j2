@@ -1,0 +1,17 @@
+---
+title: Summary of block {{ block }}
+slug: {{ block }}
+---
+
+{% raw -%}
+import { Badge } from '@astrojs/starlight/components';
+import { Code } from '@astrojs/starlight/components';
+{%- endraw %}
+
+## Sequences in block {{ block }}
+
+<div class="badge badge-info">{{ num_seqs_in_block }} sequences</div>
+
+{% for seq in seqs %}
+- [{{ seq.tag }}](/{{block}}/{{seq.tag}}): {{ seq.description }}
+{% endfor %}
