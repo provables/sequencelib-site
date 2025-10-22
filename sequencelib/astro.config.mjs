@@ -42,9 +42,18 @@ export default defineConfig({
         },
         {
           label: "Sequences",
-          // Autogenerate a group of links for the 'constellations' directory.
-          autogenerate: { directory: "sequences" },
-          collapsed: true,
+          items: [
+            {
+              label: "A000",
+              collapsed: true,
+              items: [
+                {slug: "A000"},
+                {slug: "A000/A000001"},
+                {slug: "A000/A000045"},
+                {slug: "A000/A000108"},
+              ]
+            }
+          ]
         },
       ],
       social: [
