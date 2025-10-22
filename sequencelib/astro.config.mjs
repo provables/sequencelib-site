@@ -2,6 +2,9 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
+import { generateSequencesConfig } from './gen_sidebar.mjs';
+
+const sequencesConfig = await generateSequencesConfig('./src/content/docs/sequences');
 
 // https://astro.build/config
 export default defineConfig({
@@ -40,21 +43,7 @@ export default defineConfig({
           // Autogenerate a group of links for the 'constellations' directory.
           items: ["getting_started/about", "getting_started/contributing"],
         },
-        {
-          label: "Sequences",
-          items: [
-            {
-              label: "A000",
-              collapsed: true,
-              items: [
-                {slug: "A000"},
-                {slug: "A000/A000001"},
-                {slug: "A000/A000045"},
-                {slug: "A000/A000108"},
-              ]
-            }
-          ]
-        },
+        sequencesConfig,
       ],
       social: [
         {
