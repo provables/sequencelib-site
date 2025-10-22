@@ -7,6 +7,7 @@ import networkx as nx
 from collections import OrderedDict
 import itertools
 import re
+import json
 
 HERE = Path(__file__).parent.resolve()
 SEQUENCELIB_LEAN_INFO = Path(
@@ -15,7 +16,7 @@ SEQUENCELIB_LEAN_INFO = Path(
 TEMPLATE = "seq.j2"
 SUMMARY = "block.j2"
 BASE_URL = "https://provables.github.io/sequencelib/docs"
-OUTPUT_DIR = Path("/tmp")
+OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "/tmp"))
 
 env = Environment(loader=FileSystemLoader(HERE))
 TMPL = env.get_template(TEMPLATE)
@@ -127,7 +128,7 @@ def process_tag(tag, value):
     return {
         "base_url": BASE_URL,
         "tag": tag,
-        "description": description.replace('"', '&quot;'),
+        "description": escape(description),
         "offset": offset,
         "codomain": codomain,
         "decls": decls,
@@ -176,40 +177,11 @@ def render(info, output_dir, only_block=None):
         out_file = out_dir / "summary.mdx"
         out_file.write_text(SUMMARY_TMPL.render(block=block, **by_blocks[block]))
 
-    #     base_url=BASE_URL,
-    #     tag="A000001",
-    #     module_html="Sequencelib/FiniteGroups.html",
-    #     description="Number of groups of order n.",
-    #     offset=0,
-    #     codomain="ℕ",
-    #     decls={
-    #         "NonIsoSubgroupsSymmOfOrder": {
-    #             "full_name": "Sequence.NonIsoSubgroupsSymmOfOrder",
-    #             "values": [
-    #                 (1, "Sequence.NonIsoSubgroupsSymmOfOrder_one"),
-    #                 (1, None),
-    #                 (2, None),
-    #             ],
-    #             "computability": "noncomputable",
-    #             "computability_tag": "warning",
-    #         },
-    #         "NonIsoGrpOfOrder": {
-    #             "full_name": "Sequence.NonIsoGrpOfOrder",
-    #             "values": [
-    #                 (1, None),
-    #                 (1, None),
-    #                 (2, "Sequence.NonIsoSubgroupsSymmOfOrder_two"),
-    #             ],
-    #             "computability": "noncomputable",
-    #             "computability_tag": "warning",
-    #         },
-    #     },
-    #     value_indices=[0, 1, 2],
-    #     equivalences=[
-    #         (
-    #             "NonIsoGrpOfOrder",
-    #             "NonIsoSubgroupsSymmOfOrder",
-    #             "Sequence.NonIsoGrpOfOrder_eq_NonIsoSubgroupsSymmOfOrder",
-    #         )
-    #     ],
-    # )
+
+def main(info_fpath, output_path):
+    info = json.load(Path(info_fpath).open())
+    render(info, output_path)
+
+
+if __name__ == "__main__":
+    main(SEQUENCELIB_LEAN_INFO, OUTPUT_DIR)
