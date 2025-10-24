@@ -178,6 +178,17 @@ def render(info, output_dir, only_block=None):
         out_file.write_text(SUMMARY_TMPL.render(block=block, **by_blocks[block]))
 
 
+def gen_sidebar(info_fpath, output_path):
+    info = json.load(Path(info_fpath).open())
+    by_tags = transponse_to_bytags(info)
+    by_blocks = {}
+    for tag in by_tags:
+        block = tag_to_block(tag)
+        by_blocks.setdefault(block, [])
+        by_blocks[block].append(tag)
+    output_path.write_text(json.dumps(by_blocks))
+
+
 def main(info_fpath, output_path):
     info = json.load(Path(info_fpath).open())
     render(info, output_path)

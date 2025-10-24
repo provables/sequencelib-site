@@ -92,17 +92,17 @@
     "sequencelib-lean-info": {
       "flake": false,
       "locked": {
-        "lastModified": 1760402708,
-        "narHash": "sha256-WYCddDZ8vaUh1nLSQWSeU6VUvuWCp0LVmVp6HRk6d/4=",
+        "lastModified": 1761018731,
+        "narHash": "sha256-xjnZpPN4dtfDGMtnd+QanAdS05NTxx6QOZgPg1SEgxE=",
         "ref": "refs/heads/main",
-        "rev": "dcf1bfc3f85bacd02007a273703ce7a3287f32f3",
-        "revCount": 1,
+        "rev": "f72f0ce54bb44cdd4be52766b94a871ae17854f6",
+        "revCount": 5,
         "type": "git",
-        "url": "ssh://git@provables.wetdog.digital/users/git/sequencelib-lean-info"
+        "url": "ssh://git@provables.wetdog.digital/users/git/sequencelib-lean-info.git"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@provables.wetdog.digital/users/git/sequencelib-lean-info"
+        "url": "ssh://git@provables.wetdog.digital/users/git/sequencelib-lean-info.git"
       }
     },
     "shell-utils": {

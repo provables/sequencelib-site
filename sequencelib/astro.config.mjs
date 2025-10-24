@@ -2,9 +2,27 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
-import { generateSequencesConfig } from './gen_sidebar.mjs';
+import { readFile } from "fs/promises";
+// import { generateSequencesConfig } from './gen_sidebar.mjs';
 
-const sequencesConfig = await generateSequencesConfig('./src/content/docs/sequences');
+const info = process.env.SEQUENCELIB_BY_BLOCKS || "/tmp/info_by_block.json";
+const by_blocks = JSON.parse(await readFile(info, "utf8"));
+const sequencesConfig = Object.entries(by_blocks)
+  .sort()
+  .map(([block, seqs]) => ({
+    label: block,
+    collapsed: true,
+    items: [{ label: `Summary of block ${block}`, link: `/${block}` }].concat(
+      seqs.sort().map((seq) => ({
+        label: seq,
+        link: `/${block}/${seq}`,
+      }))
+    ),
+  }));
+
+// const sequencesConfig = await generateSequencesConfig(
+//   "./src/content/docs/sequences"
+// );
 
 // https://astro.build/config
 export default defineConfig({
@@ -14,7 +32,7 @@ export default defineConfig({
     cacheDir: ".vite",
     plugins: [tailwindcss()],
     resolve: {
-      preserveSymlinks: false,
+      preserveSymlinks: true,
     },
   },
 
@@ -43,7 +61,21 @@ export default defineConfig({
           // Autogenerate a group of links for the 'constellations' directory.
           items: ["getting_started/about", "getting_started/contributing"],
         },
-        sequencesConfig,
+        // {
+        //   label: "Sequences",
+        //   items: [
+        //     {
+        //       label: "A001",
+        //       items: [
+        //         { label: "Summary of block A001", link: "/" },
+        //         { label: "A001001", link: "/A001/A001001" },
+        //         { label: "A001002", link: "/A001/A001002" },
+        //       ],
+        //     },
+        //   ],
+        // },
+        // TODO: collect sidebar from JSON obj instead of directory layout
+        { label: "Sequences", collapsed: true, items: sequencesConfig },
       ],
       social: [
         {

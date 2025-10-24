@@ -4,7 +4,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     shell-utils.url = "github:waltermoreira/shell-utils";
     sequencelib-lean-info = {
-      url = "git+ssh://git@provables.wetdog.digital/users/git/sequencelib-lean-info";
+      url = "git+ssh://git@provables.wetdog.digital/users/git/sequencelib-lean-info.git";
       flake = false;
     };
   };
@@ -19,13 +19,30 @@
           ps.jinja2
           ps.networkx
         ]);
+        sequences = pkgs.stdenv.mkDerivation {
+          name = "sequences";
+          src = ./sequencelib/scripts;
+          SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
+          buildInputs = [ myPython ];
+          buildPhase = ''
+            mkdir -p $out
+            export OUTPUT_DIR=$out
+            ./render.py
+          '';
+        };
         site = pkgs.buildNpmPackage {
-          SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/lean_oeis_info.json";
+          SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
+          NODE_OPTIONS="--max-old-space-size=16364";
           name = "site";
           src = ./sequencelib;
           npmDepsHash = "sha256-yCVRCt6fTc/zJy2jHRdWZsu9T3oQnL8h9/RI8ZeMfk4=";
           nodejs = node;
           buildInputs = with pkgs; [ myPython ];
+          preBuild = ''
+            rm -rf src/content/docs/sequences
+            ln -s ${sequences} src/content/docs/sequences
+            ls -l src/content/docs
+          '';
           installPhase = ''
             runHook preInstall
             echo "SEQUENCELIB_LEAN_INFO is $SEQUENCELIB_LEAN_INFO"
@@ -38,6 +55,7 @@
       {
         packages = {
           default = site;
+          inherit sequences;
         };
 
         devShell = shell {
