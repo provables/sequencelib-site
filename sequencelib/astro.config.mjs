@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { readFile } from "fs/promises";
 // import { generateSequencesConfig } from './gen_sidebar.mjs';
 
-const info = process.env.SEQUENCELIB_BY_BLOCKS || "/tmp/info_by_block.json";
+const info = process.env.SIDEBAR_OUTPUT || "/tmp/info_by_block.json";
 const by_blocks = JSON.parse(await readFile(info, "utf8"));
 const sequencesConfig = Object.entries(by_blocks)
   .sort()
