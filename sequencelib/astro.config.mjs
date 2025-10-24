@@ -13,6 +13,7 @@ const sequencesConfig = Object.entries(by_blocks)
     label: block,
     collapsed: true,
     items: [{ label: `Summary of block ${block}`, link: `/${block}` }].concat(
+      // @ts-ignore
       seqs.sort().map((seq) => ({
         label: seq,
         link: `/${block}/${seq}`,
