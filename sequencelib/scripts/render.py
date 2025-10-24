@@ -16,7 +16,8 @@ SEQUENCELIB_LEAN_INFO = Path(
 TEMPLATE = "seq.j2"
 SUMMARY = "block.j2"
 BASE_URL = "https://provables.github.io/sequencelib/docs"
-OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "/tmp"))
+OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "/tmp/output"))
+SIDEBAR_OUTPUT = Path(os.environ.get("SIDEBAR_OUTPUT", "/tmp/info_by_block.json"))
 
 env = Environment(loader=FileSystemLoader(HERE))
 TMPL = env.get_template(TEMPLATE)
@@ -148,8 +149,7 @@ def escape(text):
     return re.sub(r"([\*_<>{}])", r"\\\1", text)
 
 
-def render(info, output_dir, only_block=None):
-    by_tags = transponse_to_bytags(info)
+def render(by_tags, output_dir, only_block=None):
     by_blocks = {}
     for tag, value in by_tags.items():
         block = tag_to_block(tag)
@@ -178,21 +178,23 @@ def render(info, output_dir, only_block=None):
         out_file.write_text(SUMMARY_TMPL.render(block=block, **by_blocks[block]))
 
 
-def gen_sidebar(info_fpath, output_path):
-    info = json.load(Path(info_fpath).open())
-    by_tags = transponse_to_bytags(info)
+def gen_sidebar(by_tags, output_path):
     by_blocks = {}
+    print("Generating sidebar")
     for tag in by_tags:
         block = tag_to_block(tag)
         by_blocks.setdefault(block, [])
         by_blocks[block].append(tag)
     output_path.write_text(json.dumps(by_blocks))
+    print("Done")
 
 
-def main(info_fpath, output_path):
+def main(info_fpath, output_path, sidebar_path):
     info = json.load(Path(info_fpath).open())
-    render(info, output_path)
+    info_by_tags = transponse_to_bytags(info)
+    render(info_by_tags, output_path)
+    gen_sidebar(info_by_tags, sidebar_path)
 
 
 if __name__ == "__main__":
-    main(SEQUENCELIB_LEAN_INFO, OUTPUT_DIR)
+    main(SEQUENCELIB_LEAN_INFO, OUTPUT_DIR, SIDEBAR_OUTPUT)
