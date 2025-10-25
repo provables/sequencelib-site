@@ -25,30 +25,29 @@
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
           buildInputs = [ myPython ];
           buildPhase = ''
-            mkdir -p $out
-            export OUTPUT_DIR=$out
+            mkdir -p $out/sequences
+            export OUTPUT_DIR=$out/sequences
+            export SIDEBAR_OUTPUT=$out/sidebar.json
             ./render.py
           '';
         };
         site = pkgs.buildNpmPackage {
+          OUTPUT_DIR = "${sequences}/sequences";
+          SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
           NODE_OPTIONS="--max-old-space-size=16364";
           name = "site";
           src = ./sequencelib;
+          dontNpmBuild = true;
+          dontNpmInstall = true;
           npmDepsHash = "sha256-yCVRCt6fTc/zJy2jHRdWZsu9T3oQnL8h9/RI8ZeMfk4=";
           nodejs = node;
-          buildInputs = with pkgs; [ myPython ];
-          preBuild = ''
-            rm -rf src/content/docs/sequences
-            ln -s ${sequences} src/content/docs/sequences
-            ls -l src/content/docs
-          '';
-          installPhase = ''
-            runHook preInstall
-            echo "SEQUENCELIB_LEAN_INFO is $SEQUENCELIB_LEAN_INFO"
+          buildPhase = ''
+            export PATH=${pkgs.rsync}/bin:$PATH
             mkdir -p $out/public_html
-            ${pkgs.rsync}/bin/rsync -a dist/ $out/public_html
-            runHook postInstall
+            export DIST=$out/public_html
+            export _LIMIT=3
+            ${myPython}/bin/python3 ./scripts/build.py
           '';
         };
       in
