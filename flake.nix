@@ -46,7 +46,6 @@
             export PATH=${pkgs.rsync}/bin:$PATH
             mkdir -p $out/public_html
             export DIST=$out/public_html
-            export _LIMIT=3
             ${myPython}/bin/python3 ./scripts/build.py
           '';
         };

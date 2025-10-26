@@ -28,10 +28,12 @@ def gen_index(dest):
 
 def build_for_block(block, dest, tmp_dest, output_dir=OUTPUT_DIR):
     sequences = (HERE / "../src/content/docs/sequences").resolve()
+    subprocess.run(["rm", "-rf", sequences], check=True)
     sequences.mkdir(exist_ok=True, parents=True)
-    subprocess.run(["rm", "-rf", f"{sequences}/*"], check=True)
     block_path = output_dir / block
     (sequences / block).symlink_to(block_path)
+    print(f"------> for block {block}")
+    subprocess.run(["ls", "-l", sequences])
     npx_build(tmp_dest)
     out = tmp_dest / block
     shutil.move(out, dest / block)
