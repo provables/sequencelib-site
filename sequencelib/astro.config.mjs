@@ -3,7 +3,6 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
 import { readFile } from "fs/promises";
-// import { generateSequencesConfig } from './gen_sidebar.mjs';
 
 const info = process.env.SIDEBAR_OUTPUT || "/tmp/info_by_block.json";
 const by_blocks = JSON.parse(await readFile(info, "utf8"));
@@ -20,10 +19,6 @@ const sequencesConfig = Object.entries(by_blocks)
       }))
     ),
   }));
-
-// const sequencesConfig = await generateSequencesConfig(
-//   "./src/content/docs/sequences"
-// );
 
 // https://astro.build/config
 export default defineConfig({
@@ -59,23 +54,8 @@ export default defineConfig({
         },
         {
           label: "Getting Started",
-          // Autogenerate a group of links for the 'constellations' directory.
           items: ["getting_started/about", "getting_started/contributing"],
         },
-        // {
-        //   label: "Sequences",
-        //   items: [
-        //     {
-        //       label: "A001",
-        //       items: [
-        //         { label: "Summary of block A001", link: "/" },
-        //         { label: "A001001", link: "/A001/A001001" },
-        //         { label: "A001002", link: "/A001/A001002" },
-        //       ],
-        //     },
-        //   ],
-        // },
-        // TODO: collect sidebar from JSON obj instead of directory layout
         { label: "Sequences", collapsed: true, items: sequencesConfig },
       ],
       social: [
