@@ -31,11 +31,59 @@
             ./render.py
           '';
         };
+        makeCache = pkgs.buildNpmPackage {
+          name = "cache";
+          src = ./sequencelib;
+          dontNpmBuild = true;
+          dontNpmInstall = true;
+          npmDepsHash = "sha256-yCVRCt6fTc/zJy2jHRdWZsu9T3oQnL8h9/RI8ZeMfk4=";
+          nodejs = node;
+          SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
+          SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
+          buildPhase = ''
+            mkdir -p $out/public_html
+            npx astro build
+            mv .astro .vite $out
+            ${pkgs.rsync}/bin/rsync -a dist/ $out/public_html
+          '';
+        };
+        buildBlock = block: pkgs.buildNpmPackage {
+          name = "block-${block}";
+          src = ./sequencelib;
+          dontNpmBuild = true;
+          dontNpmInstall = true;
+          npmDepsHash = "sha256-yCVRCt6fTc/zJy2jHRdWZsu9T3oQnL8h9/RI8ZeMfk4=";
+          nodejs = node;
+          SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
+          SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
+          buildPhase = ''
+            ${pkgs.rsync}/bin/rsync -a --chmod=ug+rw ${makeCache}/{.astro,.vite} .
+            mkdir -p src/content/docs/sequences $out
+            ln -s ${sequences}/sequences/${block} src/content/docs/sequences/${block}
+            npx astro build
+            ${pkgs.rsync}/bin/rsync -a dist/${block} $out/
+          '';
+        };
+        buildForBlocks = blocks:
+          let
+            bs = pkgs.linkFarm "linked" (builtins.map
+              (block: { name = block; path = "${buildBlock block}/${block}"; })
+              blocks);
+          in
+          pkgs.stdenv.mkDerivation {
+            name = "buildForBlocks";
+            src = ./.;
+            buildPhase = ''
+              mkdir -p $out
+              ${pkgs.rsync}/bin/rsync -a --chmod=ug+rw ${makeCache}/public_html $out
+              ln -s ${bs}/* $out/public_html
+            '';
+          };
         site = pkgs.buildNpmPackage {
           OUTPUT_DIR = "${sequences}/sequences";
           SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
-          NODE_OPTIONS="--max-old-space-size=16364";
+          NODE_OPTIONS = "--max-old-space-size=16364";
           name = "site";
           src = ./sequencelib;
           dontNpmBuild = true;
@@ -53,7 +101,10 @@
       {
         packages = {
           default = site;
-          inherit sequences;
+          inherit sequences makeCache;
+          foo = buildBlock "A001";
+          bar = buildBlock "A002";
+          blocks = buildForBlocks [ "A001" "A002" ];
         };
 
         devShell = shell {
