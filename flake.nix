@@ -60,6 +60,7 @@
             ${pkgs.rsync}/bin/rsync -a --chmod=ug+rw ${makeCache}/{.astro,.vite} .
             mkdir -p src/content/docs/sequences $out
             ln -s ${sequences}/sequences/${block} src/content/docs/sequences/${block}
+            ${pkgs.gnused}/bin/sed -i -e 's/pagefind: .*,/pagefind: false,/' astro.config.mjs
             npx astro build
             ${pkgs.rsync}/bin/rsync -a dist/${block} $out/
           '';
@@ -70,13 +71,19 @@
               (block: { name = block; path = "${buildBlock block}/${block}"; })
               blocks);
           in
-          pkgs.stdenv.mkDerivation {
+          pkgs.buildNpmPackage {
             name = "buildForBlocks";
-            src = ./.;
+            src = ./sequencelib;
+            dontNpmBuild = true;
+            dontNpmInstall = true;
+            npmDepsHash = "sha256-yCVRCt6fTc/zJy2jHRdWZsu9T3oQnL8h9/RI8ZeMfk4=";
+            nodejs = node;
             buildPhase = ''
               mkdir -p $out
               ${pkgs.rsync}/bin/rsync -a --chmod=ug+rw ${makeCache}/public_html $out
-              ln -s ${bs}/* $out/public_html
+              # ln -s ${bs}/* $out/public_html
+              ${pkgs.rsync}/bin/rsync -av -L --chmod=ug+rw ${bs}/ $out/public_html
+              npx pagefind --site $out/public_html
             '';
           };
         site = pkgs.buildNpmPackage {

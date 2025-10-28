@@ -35,6 +35,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Sequencelib",
+      pagefind: true,
       favicon: "/favicon.png",
       lastUpdated: true,
       customCss: [
