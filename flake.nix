@@ -28,7 +28,7 @@
             mkdir -p $out/sequences
             export OUTPUT_DIR=$out/sequences
             export SIDEBAR_OUTPUT=$out/sidebar.json
-            ./render.py
+            ${myPython}/bin/python3 ./render.py
           '';
         };
         makeCache = pkgs.buildNpmPackage {
