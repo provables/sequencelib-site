@@ -40,7 +40,9 @@
           nodejs = node;
           SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
+          buildInputs = [ myPython ];
           buildPhase = ''
+            patchShebangs --build src/components
             mkdir -p $out/public_html
             npx astro build
             mv .astro .vite $out
@@ -56,7 +58,9 @@
           nodejs = node;
           SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
+          buildInputs = [ myPython ];
           buildPhase = ''
+            patchShebangs --build src/components
             ${pkgs.rsync}/bin/rsync -a --chmod=ug+rw ${makeCache}/{.astro,.vite} .
             mkdir -p src/content/docs/sequences $out
             ln -s ${sequences}/sequences/${block} src/content/docs/sequences/${block}
