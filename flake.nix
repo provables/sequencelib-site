@@ -86,24 +86,11 @@
               npx pagefind --site $out/public_html
             '';
           };
-        site = pkgs.buildNpmPackage {
-          OUTPUT_DIR = "${sequences}/sequences";
-          SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
-          SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
-          NODE_OPTIONS = "--max-old-space-size=16364";
-          name = "site";
-          src = ./sequencelib;
-          dontNpmBuild = true;
-          dontNpmInstall = true;
-          npmDepsHash = "sha256-yCVRCt6fTc/zJy2jHRdWZsu9T3oQnL8h9/RI8ZeMfk4=";
-          nodejs = node;
-          buildPhase = ''
-            export PATH=${pkgs.rsync}/bin:$PATH
-            mkdir -p $out/public_html
-            export DIST=$out/public_html
-            ${myPython}/bin/python3 ./scripts/build.py
-          '';
-        };
+        site =
+          let
+            blocks = builtins.attrNames (pkgs.lib.importJSON "${sequences}/sidebar.json");
+          in
+          buildForBlocks blocks;
       in
       {
         packages = {
