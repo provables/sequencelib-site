@@ -12,5 +12,5 @@ import { Badge } from '@astrojs/starlight/components';
 <div class="badge badge-info">{{ num_seqs_in_block }} sequences</div>
 
 {% for seq in seqs %}
-- [{{ seq.tag }}](/{{block}}/{{seq.tag}}): {{ seq.description }}
+- <a href="./{{ block }}/{{ seq.tag }}">{{ seq.tag }}</a>: {{ seq.description }}
 {% endfor %}

@@ -16,7 +16,7 @@ const { class: className } = Astro.props;
         const values = JSON.parse((button as HTMLElement).dataset.result!);
         const random_sequence = values[Math.floor(Math.random() * values.length)];
         const random_id = `A${random_sequence.toString().padStart(6, "0")}`;
-        const link = `/${random_id.slice(0, 4)}/${random_id}`;
+        const link = `./${random_id.slice(0, 4)}/${random_id}`;
         window.location.href = link;
     });
 </script>

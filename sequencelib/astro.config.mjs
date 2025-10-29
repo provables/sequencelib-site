@@ -4,6 +4,7 @@ import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
 import { readFile } from "fs/promises";
 
+const BASE = "/public_html/";
 const info = process.env.SIDEBAR_OUTPUT || "/tmp/info_by_block.json";
 const by_blocks = JSON.parse(await readFile(info, "utf8"));
 const sequencesConfig = Object.entries(by_blocks)
@@ -22,6 +23,7 @@ const sequencesConfig = Object.entries(by_blocks)
 
 // https://astro.build/config
 export default defineConfig({
+  base: BASE,
   cacheDir: ".astro",
 
   vite: {
@@ -43,6 +45,15 @@ export default defineConfig({
         "./src/styles/global.css",
         "@fontsource-variable/roboto",
         "./src/styles/all.min.css",
+      ],
+
+      head: [
+        {
+          tag: "base",
+          attrs: {
+            href: BASE,
+          },
+        },
       ],
       components: {
         Search: "./src/components/Search.astro",
