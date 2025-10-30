@@ -18,6 +18,7 @@
           ps.ipython
           ps.jinja2
           ps.networkx
+          ps.more-itertools
         ]);
         sequences = pkgs.stdenv.mkDerivation {
           name = "sequences";
@@ -64,7 +65,6 @@
             ${pkgs.rsync}/bin/rsync -a --chmod=ug+rw ${makeCache}/{.astro,.vite} .
             mkdir -p src/content/docs/sequences $out
             ln -s ${sequences}/sequences/${block} src/content/docs/sequences/${block}
-            ${pkgs.gnused}/bin/sed -i -e 's/pagefind: .*,/pagefind: false,/' astro.config.mjs
             npx astro build
             ${pkgs.rsync}/bin/rsync -a dist/${block} $out/
           '';
@@ -102,7 +102,7 @@
           inherit sequences makeCache;
           foo = buildBlock "A001";
           bar = buildBlock "A002";
-          blocks = buildForBlocks [ "A001" "A002" ];
+          blocks = buildForBlocks [ "A000" "A001" "A351"];
         };
 
         devShell = shell {

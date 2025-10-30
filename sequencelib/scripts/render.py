@@ -8,6 +8,7 @@ from collections import OrderedDict
 import itertools
 import re
 import json
+from more_itertools import stagger
 
 HERE = Path(__file__).parent.resolve()
 SEQUENCELIB_LEAN_INFO = Path(
@@ -98,10 +99,10 @@ def transponse_to_bytags(info):
             bymods["offset"] = decls_for_tag["offset"]
             decl = next(iter(decls_for_tag["decls"].values()))
             bymods["codomain"] = decl["codomain"]
-    return result
+    return OrderedDict(sorted(result.items()))
 
 
-def process_tag(tag, value):
+def process_tag(tag, value, prev_tag, next_tag):
     description = value["description"]
     offset = value["offset"]
     codomain = {"Codomain.Nat": "ℕ", "Codomain.Int": "ℤ"}[value["codomain"]]
@@ -135,14 +136,10 @@ def process_tag(tag, value):
         "decls": decls,
         "value_indices": value_indices,
         "equivalences": equivalences,
+        "prev_tag": prev_tag,
+        "next_tag": next_tag,
         "mods": set(decl["mod"] for decl in decls.values()),
     }
-
-
-def render_tag(tag, value):
-    out = OUTPUT_DIR / f"{tag}.mdx"
-    content = TMPL.render(**process_tag(tag, value))
-    out.write_text(content)
 
 
 def escape(text):
@@ -151,7 +148,19 @@ def escape(text):
 
 def render(by_tags, output_dir, only_block=None):
     by_blocks = {}
-    for tag, value in by_tags.items():
+    # iterate over a window -1, 0, +1 and set prev and next
+    for prev, cur, next in stagger(by_tags.items(), offsets=(-1, 0, 1), longest=True):
+        if cur is None:
+            continue
+        if prev is None:
+            prev_tag = None
+        else:
+            (prev_tag, _) = prev
+        if next is None:
+            next_tag = None
+        else:
+            (next_tag, _) = next
+        (tag, value) = cur
         block = tag_to_block(tag)
         by_blocks.setdefault(block, {})
         if only_block and block != only_block:
@@ -161,21 +170,26 @@ def render(by_tags, output_dir, only_block=None):
             {"tag": tag, "description": escape(value["description"])}
         )
         print(f"Rendering: {tag}")
-        data = process_tag(tag, value)
+        data = process_tag(tag, value, prev_tag, next_tag)
         content = TMPL.render(**data)
         out_dir = output_dir / block
         out_dir.mkdir(parents=True, exist_ok=True)
         out_file = out_dir / f"{tag}.mdx"
         out_file.write_text(content)
 
-    for block in by_blocks:
+    # iterate over a window -1, 0 and set prev to last of -1 and next to first of 0
+    for prev, block in stagger(by_blocks, offsets=(-1, 0)):
+        if block is None:
+            continue
         by_blocks[block]["num_seqs_in_block"] = len(by_blocks[block].get("seqs", []))
         by_blocks[block].get("seqs", []).sort(key=lambda x: x["tag"])
         print(f"Rendering summary for block: {block}")
         out_dir = output_dir / block
         out_dir.mkdir(parents=True, exist_ok=True)
         out_file = out_dir / "summary.mdx"
-        out_file.write_text(SUMMARY_TMPL.render(block=block, **by_blocks[block]))
+        out_file.write_text(
+            SUMMARY_TMPL.render(block=block, prev=prev, **by_blocks[block])
+        )
 
 
 def gen_sidebar(by_tags, output_path):

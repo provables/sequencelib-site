@@ -1,6 +1,20 @@
 ---
 title: {{ tag }}
 slug: {{ tag[:4] }}/{{ tag }}
+{% if next_tag -%}
+next: 
+  label: {{ next_tag }}
+  link: ./{{ next_tag[:4] }}/{{ next_tag }}
+{% else -%}
+next: false
+{% endif -%}
+{% if prev_tag -%}
+prev: 
+  label: {{ prev_tag }}
+  link: ./{{ prev_tag[:4] }}/{{ prev_tag }}
+{% else -%}
+prev: "/contributing"
+{% endif -%}
 ---
 
 {% raw -%}

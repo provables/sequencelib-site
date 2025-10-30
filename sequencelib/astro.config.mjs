@@ -10,15 +10,8 @@ const by_blocks = JSON.parse(await readFile(info, "utf8"));
 const sequencesConfig = Object.entries(by_blocks)
   .sort()
   .map(([block, seqs]) => ({
-    label: block,
-    collapsed: true,
-    items: [{ label: `Summary of block ${block}`, link: `/${block}` }].concat(
-      // @ts-ignore
-      seqs.sort().map((seq) => ({
-        label: seq,
-        link: `/${block}/${seq}`,
-      }))
-    ),
+    label: `${block}...`,
+    link: `/${block}`,
   }));
 
 // https://astro.build/config
@@ -68,7 +61,7 @@ export default defineConfig({
           label: "Getting Started",
           items: ["getting_started/about", "getting_started/contributing"],
         },
-        { label: "Sequences", collapsed: true, items: sequencesConfig },
+        { label: "Sequences", collapsed: false, items: sequencesConfig },
       ],
       social: [
         {
