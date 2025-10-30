@@ -55,7 +55,8 @@
           src = ./sequencelib;
           dontNpmBuild = true;
           dontNpmInstall = true;
-          npmDepsHash = "sha256-yCVRCt6fTc/zJy2jHRdWZsu9T3oQnL8h9/RI8ZeMfk4=";
+          npmDeps = pkgs.importNpmLock { npmRoot = ./sequencelib; };
+          npmConfigHook = pkgs.importNpmLock.npmConfigHook;
           nodejs = node;
           SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
@@ -102,7 +103,11 @@
           inherit sequences makeCache;
           foo = buildBlock "A001";
           bar = buildBlock "A002";
-          blocks = buildForBlocks [ "A000" "A001" "A351"];
+          baz = buildBlock "A003";
+          spam = buildBlock "A004";
+          spam5 = buildBlock "A005";
+          spam6 = buildBlock "A006";
+          blocks = buildForBlocks [ "A000" "A001" "A002" "A351"];
         };
 
         devShell = shell {
