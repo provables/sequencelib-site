@@ -143,6 +143,8 @@
           spam10 = buildBlock "A010";
           spam11 = buildBlock "A011";
           spam13 = buildBlock "A013";
+          spam14 = buildBlock "A014";
+          spam15 = buildBlock "A015";
           blocks = buildForBlocks [ "A000" "A001" "A002" "A351" ];
         };
 
