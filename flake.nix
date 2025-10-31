@@ -32,6 +32,22 @@
             ${myPython}/bin/python3 ./render.py
           '';
         };
+        a = pkgs.stdenv.mkDerivation {
+          name = "a";
+          src = ./sequencelib;
+          buildPhase = ''
+            mkdir -p $out
+            echo "a" > $out/a
+          '';
+        };
+        b = pkgs.stdenv.mkDerivation {
+          name = "b";
+          src = ./sequencelib;
+          buildPhase = ''
+            mkdir -p $out
+            echo "b" > $out/b
+          '';
+        };
         makeCache = pkgs.buildNpmPackage {
           name = "cache";
           src = ./sequencelib;
@@ -52,7 +68,23 @@
         };
         buildBlock = block: pkgs.buildNpmPackage {
           name = "block-${block}";
-          src = ./sequencelib;
+          # src = ./sequencelib;
+          src = builtins.path {
+            path = ./sequencelib;
+            name = "block-src-${block}";
+            filter = path: type:
+              let
+                ignored = [
+                  "flake.nix"
+                  "flake.lock"
+                ];
+              in
+              if pkgs.lib.lists.any (p: p == (baseNameOf path)) ignored then
+                false
+              else
+                true
+            ;
+          };
           dontNpmBuild = true;
           dontNpmInstall = true;
           npmDeps = pkgs.importNpmLock { npmRoot = ./sequencelib; };
@@ -101,13 +133,17 @@
         packages = {
           default = site;
           inherit sequences makeCache;
+          inherit a b;
           foo = buildBlock "A001";
           bar = buildBlock "A002";
           baz = buildBlock "A003";
           spam = buildBlock "A004";
           spam5 = buildBlock "A005";
           spam6 = buildBlock "A006";
-          blocks = buildForBlocks [ "A000" "A001" "A002" "A351"];
+          spam10 = buildBlock "A010";
+          spam11 = buildBlock "A011";
+          spam13 = buildBlock "A013";
+          blocks = buildForBlocks [ "A000" "A001" "A002" "A351" ];
         };
 
         devShell = shell {
