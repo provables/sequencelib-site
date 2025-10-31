@@ -32,28 +32,13 @@
             ${myPython}/bin/python3 ./render.py
           '';
         };
-        a = pkgs.stdenv.mkDerivation {
-          name = "a";
-          src = ./sequencelib;
-          buildPhase = ''
-            mkdir -p $out
-            echo "a" > $out/a
-          '';
-        };
-        b = pkgs.stdenv.mkDerivation {
-          name = "b";
-          src = ./sequencelib;
-          buildPhase = ''
-            mkdir -p $out
-            echo "b" > $out/b
-          '';
-        };
         makeCache = pkgs.buildNpmPackage {
           name = "cache";
           src = ./sequencelib;
           dontNpmBuild = true;
           dontNpmInstall = true;
-          npmDepsHash = "sha256-yCVRCt6fTc/zJy2jHRdWZsu9T3oQnL8h9/RI8ZeMfk4=";
+          npmDeps = pkgs.importNpmLock { npmRoot = ./sequencelib; };
+          npmConfigHook = pkgs.importNpmLock.npmConfigHook;
           nodejs = node;
           SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
@@ -97,12 +82,12 @@
             src = ./sequencelib;
             dontNpmBuild = true;
             dontNpmInstall = true;
-            npmDepsHash = "sha256-yCVRCt6fTc/zJy2jHRdWZsu9T3oQnL8h9/RI8ZeMfk4=";
+            npmDeps = pkgs.importNpmLock { npmRoot = ./sequencelib; };
+            npmConfigHook = pkgs.importNpmLock.npmConfigHook;
             nodejs = node;
             buildPhase = ''
               mkdir -p $out
               ${pkgs.rsync}/bin/rsync -a --chmod=ug+rw ${makeCache}/public_html $out
-              # ln -s ${bs}/* $out/public_html
               ${pkgs.rsync}/bin/rsync -av -L --chmod=ug+rw ${bs}/ $out/public_html
               npx pagefind --site $out/public_html
             '';
@@ -117,21 +102,7 @@
         packages = {
           default = site;
           inherit sequences makeCache;
-          inherit a b;
-          foo = buildBlock "A001";
-          bar = buildBlock "A002";
-          baz = buildBlock "A003";
-          spam = buildBlock "A004";
-          spam5 = buildBlock "A005";
-          spam6 = buildBlock "A006";
-          spam10 = buildBlock "A010";
-          spam11 = buildBlock "A011";
-          spam13 = buildBlock "A013";
-          spam14 = buildBlock "A014";
-          spam15 = buildBlock "A015";
-          spam16 = buildBlock "A016";
-          spam17 = buildBlock "A017";
-          blocks = buildForBlocks [ "A000" "A001" "A002" "A351" ];
+          blocks = buildForBlocks [ "A000" "A001" "A351" ];
         };
 
         devShell = shell {
