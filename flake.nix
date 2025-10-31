@@ -68,23 +68,7 @@
         };
         buildBlock = block: pkgs.buildNpmPackage {
           name = "block-${block}";
-          # src = ./sequencelib;
-          src = builtins.path {
-            path = ./sequencelib;
-            name = "block-src-${block}";
-            filter = path: type:
-              let
-                ignored = [
-                  "flake.nix"
-                  "flake.lock"
-                ];
-              in
-              if pkgs.lib.lists.any (p: p == (baseNameOf path)) ignored then
-                false
-              else
-                true
-            ;
-          };
+          src = ./sequencelib;
           dontNpmBuild = true;
           dontNpmInstall = true;
           npmDeps = pkgs.importNpmLock { npmRoot = ./sequencelib; };
@@ -145,6 +129,8 @@
           spam13 = buildBlock "A013";
           spam14 = buildBlock "A014";
           spam15 = buildBlock "A015";
+          spam16 = buildBlock "A016";
+          spam17 = buildBlock "A017";
           blocks = buildForBlocks [ "A000" "A001" "A002" "A351" ];
         };
 
