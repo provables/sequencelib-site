@@ -107,6 +107,14 @@
 
         devShell = shell {
           name = "sequencelib-site";
+          packages = with pkgs; [
+            importNpmLock.hooks.linkNodeModulesHook
+            node
+          ];
+          npmDeps = pkgs.importNpmLock.buildNodeModules {
+            npmRoot = ./sequencelib;
+            nodejs = node;
+          };
           buildInputs = with pkgs; [
             myPython
             go-task
