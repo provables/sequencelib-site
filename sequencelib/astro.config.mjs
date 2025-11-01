@@ -40,14 +40,6 @@ export default defineConfig({
         "./src/styles/all.min.css",
       ],
 
-      head: [
-        {
-          tag: "base",
-          attrs: {
-            href: BASE,
-          },
-        },
-      ],
       components: {
         Search: "./src/components/Search.astro",
         Pagination: "./src/components/Pagination.astro",
