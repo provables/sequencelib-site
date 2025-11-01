@@ -26,7 +26,9 @@ import { Badge } from '@astrojs/starlight/components';
 [Lean4<i class="fa-solid fa-up-right-from-square"></i>](https://provables.github.io/sequencelib/docs/{{ m }}) 
 {% endfor %}
 
+<p data-pagefind-weight="5">
 {{ description }}
+</p>
 
 <div class="badge badge-info">offset: {{ offset }}</div>
 <div class="badge badge-info">codomain: {{ codomain }}</div>
@@ -34,7 +36,7 @@ import { Badge } from '@astrojs/starlight/components';
 ## Declarations
 
 {% for name, decl in decls.items()|sort %}
-- <span>
+- <span data-pagefind-weight="3">
     <a href="{{ base_url }}/{{ decl.mod }}#{{ decl.full_name }}" class="align-middle">{{ name }}</a>
     <span class="badge badge-{{ decl.computability_tag }} ml-4 mb-0">{{ decl.computability }}</span>
   </span>
