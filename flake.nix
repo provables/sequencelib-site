@@ -32,9 +32,9 @@
             ${myPython}/bin/python3 ./render.py
           '';
         };
-        makeCache = pkgs.buildNpmPackage {
+        makeSrc = src: pkgs.buildNpmPackage {
+          inherit src;
           name = "cache";
-          src = ./sequencelib;
           dontNpmBuild = true;
           dontNpmInstall = true;
           npmDeps = pkgs.importNpmLock { npmRoot = ./sequencelib; };
@@ -42,7 +42,7 @@
           nodejs = node;
           SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
-          buildInputs = [ myPython ];
+          buildInputs = [ myPython pkgs.perl ];
           buildPhase = ''
             patchShebangs --build src/components
             mkdir -p $out/public_html
@@ -51,9 +51,22 @@
             ${pkgs.rsync}/bin/rsync -a dist/ $out/public_html
           '';
         };
+        filteredSrc = builtins.path {
+          name = "filtered-src";
+          path = ./sequencelib;
+          filter = path: type: type != "directory" || baseNameOf path != "content";
+        };
+        makeCache = (makeSrc filteredSrc).overrideAttrs (final: prev: {
+          buildPhase = ''
+            ${pkgs.perl}/bin/perl -i -0pe \
+              's/sidebar: \[.*?\],\n *social/sidebar: [],\n      social/s' \
+              astro.config.mjs
+          '' + prev.buildPhase;
+        });
+        makeFull = makeSrc ./sequencelib;
         buildBlock = block: pkgs.buildNpmPackage {
           name = "block-${block}";
-          src = ./sequencelib;
+          src = filteredSrc;
           dontNpmBuild = true;
           dontNpmInstall = true;
           npmDeps = pkgs.importNpmLock { npmRoot = ./sequencelib; };
@@ -63,6 +76,9 @@
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
           buildInputs = [ myPython ];
           buildPhase = ''
+            ${pkgs.perl}/bin/perl -i -0pe \
+              's/sidebar: \[.*?\],\n *social/sidebar: [{label: "Sequences", items: sequencesConfig}],\n      social/s' \
+              astro.config.mjs
             patchShebangs --build src/components
             ${pkgs.rsync}/bin/rsync -a --chmod=ug+rw ${makeCache}/{.astro,.vite} .
             mkdir -p src/content/docs/sequences $out
@@ -87,8 +103,8 @@
             nodejs = node;
             buildPhase = ''
               mkdir -p $out
-              ${pkgs.rsync}/bin/rsync -a --chmod=ug+rw ${makeCache}/public_html $out
-              ${pkgs.rsync}/bin/rsync -av -L --chmod=ug+rw ${bs}/ $out/public_html
+              ${pkgs.rsync}/bin/rsync -a --chmod=ug+rw ${makeFull}/public_html $out
+              ${pkgs.rsync}/bin/rsync -a -L --chmod=ug+rw ${bs}/ $out/public_html
               npx pagefind --site $out/public_html
             '';
           };
@@ -101,8 +117,8 @@
       {
         packages = {
           default = site;
-          inherit sequences makeCache;
-          blocks = buildForBlocks [ "A000" "A001" "A351" ];
+          inherit sequences makeCache makeFull;
+          blocks = buildForBlocks [ "A000" "A001" "A002" ];
         };
 
         devShell = shell {
