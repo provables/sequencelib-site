@@ -16,7 +16,9 @@ SEQUENCELIB_LEAN_INFO = Path(
 )
 TEMPLATE = "seq.j2"
 SUMMARY = "block.j2"
-BASE_URL = "https://provables.github.io/sequencelib/docs"
+BASE_URL = os.environ.get(
+    "DOCS_BASE_URL", "https://provables.github.io/sequencelib/docs"
+)
 OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "/tmp/output"))
 SIDEBAR_OUTPUT = Path(os.environ.get("SIDEBAR_OUTPUT", "/tmp/info_by_block.json"))
 

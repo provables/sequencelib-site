@@ -23,7 +23,7 @@ import { Badge } from '@astrojs/starlight/components';
 
 [OEIS<i class="fa-solid fa-up-right-from-square"></i>](https://oeis.org/{{ tag }}) 
 {% for m in mods -%}
-[Lean4<i class="fa-solid fa-up-right-from-square"></i>](https://provables.github.io/sequencelib/docs/{{ m }}) 
+[Lean4<i class="fa-solid fa-up-right-from-square"></i>]({{ base_url }}/docs/{{ m }}) 
 {% endfor %}
 
 <p data-pagefind-weight="5">
@@ -37,7 +37,7 @@ import { Badge } from '@astrojs/starlight/components';
 
 {% for name, decl in decls.items()|sort %}
 - <span data-pagefind-weight="3">
-    <a href="{{ base_url }}/{{ decl.mod }}#{{ decl.full_name }}" class="align-middle">{{ name }}</a>
+    <a href="{{ base_url }}/docs/{{ decl.mod }}#{{ decl.full_name }}" class="align-middle">{{ name }}</a>
     <span class="badge badge-{{ decl.computability_tag }} ml-4 mb-0">{{ decl.computability }}</span>
   </span>
 {%- endfor %}
@@ -60,11 +60,11 @@ import { Badge } from '@astrojs/starlight/components';
     <tbody>
       {%- for name, decl in decls.items()|sort %}
       <tr>
-        <th><a href="{{ base_url }}/{{ decl.mod }}#{{ decl.full_name }}">{{ name.strip() }}</a></th>
+        <th><a href="{{ base_url }}/docs/{{ decl.mod }}#{{ decl.full_name }}">{{ name.strip() }}</a></th>
         {%- for value in decl["values"] %}
         <td class="text-right">
           {%- if value[1] %}
-            <a href="{{ base_url }}/{{ decl.mod }}#{{ value[1] }}">{{ value[0] }}</a>
+            <a href="{{ base_url }}/docs/{{ decl.mod }}#{{ value[1] }}">{{ value[0] }}</a>
           {%- else %}
             {{ value[0] }}
           {%- endif %}
@@ -80,5 +80,5 @@ import { Badge } from '@astrojs/starlight/components';
 ## Equivalences
 
 {% for seq1, seq2, equiv, mod in equivalences %}
-- [{{ seq1 }} = {{ seq2 }}]({{ base_url }}/{{ mod }}#{{ equiv }})
+- [{{ seq1 }} = {{ seq2 }}]({{ base_url }}/docs/{{ mod }}#{{ equiv }})
 {% endfor %}
