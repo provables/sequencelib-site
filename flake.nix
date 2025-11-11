@@ -3,16 +3,18 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
     shell-utils.url = "github:waltermoreira/shell-utils";
+    sequencelib.url = "github:provables/sequencelib?ref=synth";
     sequencelib-lean-info = {
       url = "git+ssh://git@provables.wetdog.digital/users/git/sequencelib-lean-info.git";
       flake = false;
     };
   };
-  outputs = { nixpkgs, flake-utils, shell-utils, sequencelib-lean-info, ... }:
+  outputs = { nixpkgs, flake-utils, shell-utils, sequencelib, sequencelib-lean-info, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         shell = shell-utils.myShell.${system};
+        sequencelibDocs = sequencelib.packages.${system}.sequencelibDocs;
         node = pkgs.nodejs_24;
         myPython = pkgs.python313.withPackages (ps: [
           ps.ipython
@@ -20,10 +22,12 @@
           ps.networkx
           ps.more-itertools
         ]);
+        DOCS_BASE_URL = "/sequencelib";
         sequences = pkgs.stdenv.mkDerivation {
           name = "sequences";
           src = ./sequencelib/scripts;
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
+          inherit DOCS_BASE_URL;
           buildInputs = [ myPython ];
           buildPhase = ''
             mkdir -p $out/sequences
@@ -42,6 +46,7 @@
           nodejs = node;
           SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
+          inherit DOCS_BASE_URL;
           buildInputs = [ myPython pkgs.perl ];
           buildPhase = ''
             patchShebangs --build src/components
@@ -56,17 +61,11 @@
           path = ./sequencelib;
           filter = path: type: type != "directory" || baseNameOf path != "content";
         };
-        makeCache = (makeSrc filteredSrc).overrideAttrs (final: prev: {
-          buildPhase = ''
-            ${pkgs.perl}/bin/perl -i -0pe \
-              's/sidebar: \[.*?\],\n *social/sidebar: [],\n      social/s' \
-              astro.config.mjs
-          '' + prev.buildPhase;
-        });
+        makeCache = makeSrc ./sequencelib;
         makeFull = makeSrc ./sequencelib;
         buildBlock = block: pkgs.buildNpmPackage {
           name = "block-${block}";
-          src = filteredSrc;
+          src = ./sequencelib;
           dontNpmBuild = true;
           dontNpmInstall = true;
           npmDeps = pkgs.importNpmLock { npmRoot = ./sequencelib; };
@@ -74,11 +73,9 @@
           nodejs = node;
           SIDEBAR_OUTPUT = "${sequences}/sidebar.json";
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
+          inherit DOCS_BASE_URL;
           buildInputs = [ myPython ];
           buildPhase = ''
-            ${pkgs.perl}/bin/perl -i -0pe \
-              's/sidebar: \[.*?\],\n *social/sidebar: [{label: "Sequences", items: sequencesConfig}],\n      social/s' \
-              astro.config.mjs
             patchShebangs --build src/components
             ${pkgs.rsync}/bin/rsync -a --chmod=ug+rw ${makeCache}/{.astro,.vite} .
             mkdir -p src/content/docs/sequences $out
@@ -108,17 +105,32 @@
               npx pagefind --site $out/public_html
             '';
           };
-        site =
+        allBlocks = builtins.attrNames (pkgs.lib.importJSON "${sequences}/sidebar.json");
+        siteNoDocs = buildForBlocks allBlocks;
+        siteWithDocs = blocks:
           let
-            blocks = builtins.attrNames (pkgs.lib.importJSON "${sequences}/sidebar.json");
+            currentSite = buildForBlocks blocks;
+            links = pkgs.linkFarm "linkedWithDocs" ([
+              {
+                name = "docs";
+                path = "${sequencelibDocs}/doc";
+              }
+            ] ++ builtins.attrValues (builtins.mapAttrs
+              (file: type: {
+                name = file;
+                path = "${currentSite}/public_html/${file}";
+              })
+              (builtins.readDir "${currentSite}/public_html")));
           in
-          buildForBlocks blocks;
+          links;
+        site = siteWithDocs allBlocks;
       in
       {
         packages = {
           default = site;
-          inherit sequences makeCache makeFull;
+          inherit site sequences makeCache makeFull;
           blocks = buildForBlocks [ "A000" "A001" "A002" ];
+          blocksDocs = siteWithDocs [ "A000" "A001" ];
         };
 
         devShell = shell {
