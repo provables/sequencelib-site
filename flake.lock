@@ -535,11 +535,11 @@
         "synthetic": "synthetic"
       },
       "locked": {
-        "lastModified": 1762815168,
-        "narHash": "sha256-xR09Fc3D3kTbwbi+OzjqT99J1w9uDazHR5R+sCPpktY=",
+        "lastModified": 1763142028,
+        "narHash": "sha256-e+FOuCZbCtywr80T3yYHbYdSbwmIAs8aZEuIbaVkMPg=",
         "owner": "provables",
         "repo": "sequencelib",
-        "rev": "6bec206672a327f83f5f8076efc022e4dbbe3c31",
+        "rev": "4d8fb69ac30af0e80758a0b214f6ec3003dffa6e",
         "type": "github"
       },
       "original": {
