@@ -52,7 +52,11 @@ export default defineConfig({
         },
         {
           label: "Getting Started",
-          items: ["getting_started/about", "getting_started/contributing"],
+          items: [
+            "getting_started/about",
+            "getting_started/contributing",
+            "acknowledgments",
+          ],
         },
         { label: "Sequences", collapsed: false, items: sequencesConfig },
       ],
