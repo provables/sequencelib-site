@@ -3,7 +3,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
     shell-utils.url = "github:waltermoreira/shell-utils";
-    sequencelib.url = "github:provables/sequencelib?ref=synth";
+    sequencelib.url = "github:provables/sequencelib";
     sequencelib-lean-info = {
       url = "git+ssh://git@provables.wetdog.digital/users/git/sequencelib-lean-info.git";
       flake = false;

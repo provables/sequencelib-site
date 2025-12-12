@@ -54,6 +54,7 @@ export default defineConfig({
           label: "Getting Started",
           items: [
             "getting_started/about",
+            "getting_started/collaborators",
             "getting_started/contributing",
             "acknowledgments",
           ],
