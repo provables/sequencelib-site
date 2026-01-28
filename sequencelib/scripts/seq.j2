@@ -32,6 +32,16 @@ import { Badge } from '@astrojs/starlight/components';
 
 <div class="badge badge-info">offset: {{ offset }}</div>
 <div class="badge badge-info">codomain: {{ codomain }}</div>
+{% for badge in badges -%}
+<div class="badge badge-warning tooltip">
+  <div class="tooltip-content bg-warning text-warning-content w-64">
+    <p>
+      {{ badge_descriptions[badge] }}
+    </p>
+  </div>
+  <span>{{ badge }}</span>
+</div>
+{%- endfor %}
 
 ## Declarations
 

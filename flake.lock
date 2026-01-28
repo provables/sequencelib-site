@@ -551,11 +551,11 @@
     "sequencelib-lean-info": {
       "flake": false,
       "locked": {
-        "lastModified": 1761018731,
-        "narHash": "sha256-xjnZpPN4dtfDGMtnd+QanAdS05NTxx6QOZgPg1SEgxE=",
+        "lastModified": 1769467040,
+        "narHash": "sha256-RZFoIiCPUQwJuzec32IpUuRz9K572+WTFJFuAIFzYr4=",
         "ref": "refs/heads/main",
-        "rev": "f72f0ce54bb44cdd4be52766b94a871ae17854f6",
-        "revCount": 5,
+        "rev": "5155f445e15ba10e8e09826d6c9fd1c163777c00",
+        "revCount": 6,
         "type": "git",
         "url": "ssh://git@provables.wetdog.digital/users/git/sequencelib-lean-info.git"
       },

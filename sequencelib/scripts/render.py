@@ -14,6 +14,7 @@ HERE = Path(__file__).parent.resolve()
 SEQUENCELIB_LEAN_INFO = Path(
     os.environ.get("SEQUENCELIB_LEAN_INFO", "/tmp/sequencelib_lean_info.json")
 )
+MANUAL_TAGS = Path(os.environ.get("MANUAL_TAGS", "/tmp/manual_tags.json"))
 TEMPLATE = "seq.j2"
 SUMMARY = "block.j2"
 BASE_URL = os.environ.get(
@@ -21,10 +22,13 @@ BASE_URL = os.environ.get(
 )
 OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "/tmp/output"))
 SIDEBAR_OUTPUT = Path(os.environ.get("SIDEBAR_OUTPUT", "/tmp/info_by_block.json"))
+CONFIDENCE_THRESHOLD = 20
 
 env = Environment(loader=FileSystemLoader(HERE))
 TMPL = env.get_template(TEMPLATE)
 SUMMARY_TMPL = env.get_template(SUMMARY)
+
+MANUAL_TAGS_JSON = json.load(Path(MANUAL_TAGS).open())
 
 
 def all_equivalences(equivalences):
@@ -104,6 +108,43 @@ def transponse_to_bytags(info):
     return OrderedDict(sorted(result.items()))
 
 
+BADGE_DESCRIPTIONS = {
+    "finite": (
+        "The OEIS sequence is finite. "
+        "The function defined in Lean has domain ℕ, and"
+        "while it coincides with the OEIS in the known values, "
+        "the Lean code might not represent the mathematical "
+        "concept."
+    ),
+    "dead": (
+        'The OEIS sequence has the tag "dead", and it will be removed '
+        "from Sequencelib."
+    ),
+    "low confidence": (
+        'The OEIS sequence has the tags "hard" and/or "more" and few known values. '
+        "It is likely that the Lean code is not representing the actual sequence, "
+        "even though it coincides in the known values."
+    ),
+    "question": (
+        "The Lean code agrees with all the values in OEIS for this sequence, and "
+        "the number of known values is significant, but a better mathematical "
+        "formulation is needed."
+    )
+}
+
+
+def make_badges(tag, value, value_indices, confidence_threshold=CONFIDENCE_THRESHOLD):
+    keywords = value["keywords"]
+    badges = {
+        "finite": "fini" in keywords,
+        "dead": "dead" in keywords,
+        "low confidence": (("hard" in keywords) or ("more" in keywords))
+        and (len(value_indices) < confidence_threshold),
+    }
+    badges.update(MANUAL_TAGS_JSON.get(tag, {}))
+    return [key for (key, value) in badges.items() if value]
+
+
 def process_tag(tag, value, prev_tag, next_tag):
     description = value["description"]
     offset = value["offset"]
@@ -129,6 +170,7 @@ def process_tag(tag, value, prev_tag, next_tag):
         for (decl, decl_data) in all_decls_for_tag.items()
     }
     equivalences = [(a, b, c, name_to_mod(m)) for (a, b), (c, m) in equivs.items()]
+    badges = make_badges(tag, value, value_indices)
     return {
         "base_url": BASE_URL,
         "tag": tag,
@@ -141,6 +183,8 @@ def process_tag(tag, value, prev_tag, next_tag):
         "prev_tag": prev_tag,
         "next_tag": next_tag,
         "mods": set(decl["mod"] for decl in decls.values()),
+        "badges": badges,
+        "badge_descriptions": BADGE_DESCRIPTIONS,
     }
 
 

@@ -27,6 +27,7 @@
           name = "sequences";
           src = ./sequencelib/scripts;
           SEQUENCELIB_LEAN_INFO = "${sequencelib-lean-info}/sequencelib_lean_info.json";
+          MANUAL_TAGS = "${sequencelib-lean-info}/manual_tags.json";
           inherit DOCS_BASE_URL;
           buildInputs = [ myPython ];
           buildPhase = ''
@@ -130,7 +131,7 @@
           default = site;
           inherit site sequences makeCache makeFull;
           blocks = buildForBlocks [ "A000" "A001" "A002" ];
-          blocksDocs = siteWithDocs [ "A000" "A001" ];
+          blocksDocs = siteWithDocs [ "A000" ];
         };
 
         devShell = shell {
